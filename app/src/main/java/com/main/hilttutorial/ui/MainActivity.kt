@@ -31,10 +31,13 @@ class MainActivity : AppCompatActivity(), BlogAdapter.BlogClickListeners {
         binding.blogsList.setHasFixedSize(true)
         subscribeObservers()
         viewModel.setStateEvent(MainStateEvent.GetBlogEvents)
+        binding.refresh.setOnClickListener {
+            showSnackBar("To be implemented")
+        }
     }
 
     private fun subscribeObservers() {
-        viewModel.dataState.observe(this, Observer { dataState ->
+        viewModel.dataState.observe(this, { dataState ->
             when (dataState) {
                 is DataState.Success<List<Blog>> -> {
                     displayProgressBar(false)

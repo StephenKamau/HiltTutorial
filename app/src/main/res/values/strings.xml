@@ -7,4 +7,5 @@
     <string name="description">description</string>
     <string name="view">View</string>
     <string name="favourite">favourite</string>
+    <string name="refresh">Refresh</string>
 </resources>

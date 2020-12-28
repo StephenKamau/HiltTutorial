@@ -29,6 +29,13 @@ class MainViewModel @ViewModelInject constructor(
                         }
                         .launchIn(viewModelScope)
                 }
+                is MainStateEvent.Refresh -> {
+                    repository.getBlog()
+                        .onEach { dataState ->
+                            _dataState.value = dataState
+                        }
+                        .launchIn(viewModelScope)
+                }
             }
         }
     }
@@ -36,5 +43,5 @@ class MainViewModel @ViewModelInject constructor(
 
 sealed class MainStateEvent {
     object GetBlogEvents : MainStateEvent()
-    object None : MainStateEvent()
+    object Refresh : MainStateEvent()
 }
