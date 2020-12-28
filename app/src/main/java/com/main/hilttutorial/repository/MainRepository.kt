@@ -20,7 +20,6 @@ class MainRepository @Inject constructor(
 ) {
     suspend fun getBlog(): Flow<DataState<List<Blog>>> = flow {
         emit(DataState.Loading)
-        delay(1000)
         try {
             val networkBlogs = retrofit.get()
             val blogs = networkMapper.mapFromEntityList(networkBlogs)

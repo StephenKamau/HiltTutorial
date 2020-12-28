@@ -6,6 +6,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import com.google.android.material.snackbar.Snackbar
 import com.main.hilttutorial.R
 import com.main.hilttutorial.databinding.ActivityMainBinding
 import com.main.hilttutorial.model.Blog
@@ -15,14 +16,19 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.lang.StringBuilder
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), BlogAdapter.BlogClickListeners {
     private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
+    private lateinit var blogAdapter: BlogAdapter
+
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        blogAdapter = BlogAdapter(this)
+        binding.blogsList.adapter = blogAdapter
+        binding.blogsList.setHasFixedSize(true)
         subscribeObservers()
         viewModel.setStateEvent(MainStateEvent.GetBlogEvents)
     }
@@ -32,13 +38,16 @@ class MainActivity : AppCompatActivity() {
             when (dataState) {
                 is DataState.Success<List<Blog>> -> {
                     displayProgressBar(false)
-                    appendBlogTitles(dataState.data)
+                    displayBlogList(true)
+                    displayBlogListInRecyclerView(dataState.data)
                 }
                 is DataState.Loading -> {
                     displayProgressBar(true)
+                    displayBlogList(false)
                 }
                 is DataState.Error -> {
                     displayProgressBar(false)
+                    displayBlogList(false)
                     displayError(dataState.exception.message)
                 }
             }
@@ -47,21 +56,36 @@ class MainActivity : AppCompatActivity() {
 
     private fun displayError(message: String?) {
         if (message != null) {
-            binding.text.text = message
+            showSnackBar(message)
         } else {
-            binding.text.text = "Unknown error"
+            showSnackBar(getString(R.string.unknown_error))
         }
+    }
+
+    private fun showSnackBar(message: String?) {
+        if (message != null) {
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private fun displayBlogListInRecyclerView(blogs: List<Blog>) {
+        blogAdapter.submitList(blogs)
     }
 
     private fun displayProgressBar(isDisplayed: Boolean) {
         binding.progressBar.visibility = if (isDisplayed) View.VISIBLE else View.GONE
     }
 
-    private fun appendBlogTitles(blogs: List<Blog>) {
-        val sb = StringBuilder()
-        for (blog in blogs) {
-            sb.append(blog.title + "\n")
-        }
-        binding.text.text = sb.toString()
+    private fun displayBlogList(isDisplayed: Boolean) {
+        binding.blogsList.visibility = if (isDisplayed) View.VISIBLE else View.GONE
     }
+
+    override fun onAddToFavouritesClicked(blog: Blog) {
+        showSnackBar("'${blog.title}' added to favourites")
+    }
+
+    override fun onViewDetailsClicked(blog: Blog) {
+        showSnackBar("You clicked '${blog.title}' blog")
+    }
+
 }

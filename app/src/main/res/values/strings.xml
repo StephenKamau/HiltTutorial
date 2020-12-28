@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">HiltTutorial</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="blog_image">blog image</string>
+    <string name="title">Title</string>
+    <string name="category">category</string>
+    <string name="description">description</string>
+    <string name="view">View</string>
+    <string name="favourite">favourite</string>
 </resources>
